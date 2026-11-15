@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Areeb's Tracker</title>
+<style>
+:root{--bg:#0b0d12;--panel:#141923;--panel2:#1b2230;--line:#293244;--text:#f3f6fb;--muted:#9ba8ba;--blue:#69a7ff;--green:#70d6a2;--red:#ff8585}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#18243a 0,transparent 36%),var(--bg);color:var(--text);font:15px/1.5 Inter,Segoe UI,Arial,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:28px 18px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}h1{font-size:clamp(28px,5vw,42px);margin:4px 0}p{color:var(--muted);margin:4px 0}.day-banner{display:inline-flex;align-items:center;gap:12px;margin-top:14px;padding:10px 15px;background:#1b2940;border:1px solid #34517a;border-radius:13px}.day-banner strong{font-size:24px;letter-spacing:1px;color:#8bbcff}.day-kicker{font-size:10px;letter-spacing:1.3px;font-weight:800;color:#aebed4}.day-banner span:last-child{font-size:12px;color:var(--muted)}.pill{border:1px solid var(--line);border-radius:30px;padding:8px 13px;color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.panel{background:rgba(20,25,35,.94);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 32px #0002}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.stat{background:var(--panel2);border-radius:13px;padding:14px}.stat strong{display:block;font-size:25px}.stat span{font-size:12px;color:var(--muted)}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:14px;margin:20px 0 10px;color:#dce6f5}.fieldgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:12px;color:var(--muted);font-weight:700}input,select,textarea{width:100%;background:#0e131c;border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--text);font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--blue)}textarea{min-height:86px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer;font:inherit}.primary{background:var(--blue);color:#07111f}.secondary{background:#273246;color:var(--text);border:1px solid var(--line)}.danger{background:#3a2228;color:#ffb2b2;border:1px solid #61343e}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.exercise{display:grid;grid-template-columns:1.3fr .7fr .7fr auto;gap:8px;align-items:end;margin-bottom:9px}.exercise button{padding:10px}.muted{color:var(--muted);font-size:12px}.history{display:flex;flex-direction:column;gap:9px;max-height:570px;overflow:auto}.entry{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px;cursor:pointer}.entry.active{border-color:var(--blue)}.entrytop{display:flex;justify-content:space-between;gap:8px}.entry strong{font-size:14px}.entry small{color:var(--muted)}.tag{font-size:11px;color:var(--green);background:#18352d;padding:3px 8px;border-radius:20px}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}.notice{font-size:12px;color:var(--muted);margin-top:12px}.bar{height:7px;background:#252e3d;border-radius:9px;overflow:hidden;margin-top:9px}.bar>i{display:block;height:100%;background:var(--blue);width:0}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.exercise{grid-template-columns:1fr 1fr 1fr auto}.top{align-items:flex-start;flex-direction:column}}
+@media(max-width:430px){.fieldgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.exercise{grid-template-columns:1fr 1fr}.exercise .exname{grid-column:1/-1}.stats strong{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><div class="eyebrow">Consistency • Progress • Recovery</div><h1>Areeb's Tracker</h1><p>Your training, one day at a time.</p><div class="day-banner"><span class="day-kicker">CURRENT TRACKING DAY</span><strong id="currentDay">DAY 01</strong><span id="currentDayDate"></span></div></div>
+    <div class="pill" id="todayLabel"></div>
+  </header>
+  <div class="stats">
+    <div class="stat"><strong id="totalDays">0</strong><span>Days logged</span></div>
+    <div class="stat"><strong id="totalWorkouts">0</strong><span>Workout days</span></div>
+    <div class="stat"><strong id="streak">0</strong><span>Current streak</span></div>
+  </div>
+  <div class="grid">
+    <main class="panel">
+      <h2 id="formTitle">Log your day</h2>
+      <div class="fieldgrid">
+        <div class="field"><label for="date">DATE</label><input id="date" type="date"></div>
+        <div class="field"><label for="type">SESSION</label><select id="type"><option value="Workout">Workout</option><option value="Rest / Recovery">Rest / Recovery</option><option value="Active recovery">Active recovery</option></select></div>
+        <div class="field"><label for="focus">WORKOUT FOCUS</label><input id="focus" placeholder="e.g. Upper body, legs, football"></div>
+        <div class="field"><label for="duration">DURATION (MINUTES)</label><input id="duration" type="number" min="0" max="600" placeholder="e.g. 45"></div>
+        <div class="field"><label for="energy">ENERGY (1–5)</label><select id="energy"><option value="">Choose</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+        <div class="field"><label for="recovery">RECOVERY (1–5)</label><select id="recovery"><option value="">Choose</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+      </div>
+      <h3>Exercises</h3>
+      <div id="exerciseList"></div>
+      <button class="secondary" id="addExercise" type="button">+ Add exercise</button>
+      <h3>Daily notes</h3>
+      <div class="field"><label for="notes">WHAT WENT WELL? WHAT SHOULD YOU ADJUST NEXT TIME?</label><textarea id="notes" placeholder="Technique, strength, mood, soreness, personal bests, or anything you noticed..."></textarea></div>
+      <div class="actions">
+        <button class="primary" id="save">Save day</button>
+        <button class="secondary" id="newDay">New day</button>
+        <button class="secondary" id="clearForm">Clear form</button>
+        <button class="danger" id="deleteDay" style="display:none">Delete this day</button>
+      </div>
+      <div class="notice">Your entries are saved in this browser on this device. Export a backup regularly if you don't want to lose them.</div>
+    </main>
+    <aside class="panel">
+      <h2>Day-by-day history</h2>
+      <p class="muted" style="margin-bottom:14px">Select a day to review or edit it.</p>
+      <div class="history" id="history"><div class="empty">No days logged yet. Save your first entry to begin Day 1.</div></div>
+      <div class="actions"><button class="secondary" id="export">Export backup</button><button class="secondary" id="importBtn">Import backup</button><input id="importFile" type="file" accept="application/json" hidden></div>
+      <div class="notice">Day numbers follow the order of dates you log. You can add tomorrow's entry whenever you're ready.</div>
+    </aside>
+  </div>
+</div>
+<script>
+const KEY='workoutJournalV1';
+let entries=JSON.parse(localStorage.getItem(KEY)||'[]');
+let editingDate=null;
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString('en-CA');
+$('todayLabel').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',year:'numeric'});
+$('date').value=today();
+function persist(){localStorage.setItem(KEY,JSON.stringify(entries));render()}
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function addExercise(data={}){const row=document.createElement('div');row.className='exercise';row.innerHTML=`<div class="field exname"><label>EXERCISE</label><input class="ex-name" placeholder="e.g. Push-ups" value="${safe(data.name)}"></div><div class="field"><label>SETS</label><input class="ex-sets" type="number" min="0" placeholder="3" value="${safe(data.sets)}"></div><div class="field"><label>REPS</label><input class="ex-reps" placeholder="10" value="${safe(data.reps)}"></div><button class="danger remove" type="button" aria-label="Remove exercise">×</button>`;row.querySelector('.remove').onclick=()=>row.remove();$('exerciseList').append(row)}
+function collect(){return {date:$('date').value,type:$('type').value,focus:$('focus').value.trim(),duration:$('duration').value,energy:$('energy').value,recovery:$('recovery').value,notes:$('notes').value.trim(),exercises:[...$('exerciseList').querySelectorAll('.exercise')].map(r=>({name:r.querySelector('.ex-name').value.trim(),sets:r.querySelector('.ex-sets').value,reps:r.querySelector('.ex-reps').value})).filter(x=>x.name)}}
+function reset(){editingDate=null;$('formTitle').textContent='Log your day';$('date').value=today();$('type').value='Workout';$('focus').value='';$('duration').value='';$('energy').value='';$('recovery').value='';$('notes').value='';$('exerciseList').innerHTML='';addExercise();$('deleteDay').style.display='none'}
+function load(e){editingDate=e.date;$('formTitle').textContent=`Edit ${dayNumber(e.date)}`;$('date').value=e.date;$('type').value=e.type;$('focus').value=e.focus;$('duration').value=e.duration;$('energy').value=e.energy;$('recovery').value=e.recovery;$('notes').value=e.notes;$('exerciseList').innerHTML='';(e.exercises||[]).forEach(addExercise);if(!e.exercises?.length)addExercise();$('deleteDay').style.display='inline-block';window.scrollTo({top:0,behavior:'smooth'})}
+function dayNumber(date){return [...entries].sort((a,b)=>a.date.localeCompare(b.date)).findIndex(e=>e.date===date)+1}
+function render(){entries.sort((a,b)=>a.date.localeCompare(b.date));const todayEntry=entries.find(e=>e.date===today());const currentDayNumber=todayEntry?dayNumber(today()):entries.length+1;$('currentDay').textContent='DAY '+String(currentDayNumber).padStart(2,'0');$('currentDayDate').textContent=todayEntry?'Today is logged':'Next entry';$('totalDays').textContent=entries.length;$('totalWorkouts').textContent=entries.filter(e=>e.type==='Workout').length;
+let streak=0, cursor=new Date();const dates=new Set(entries.map(e=>e.date));if(!dates.has(today()))cursor.setDate(cursor.getDate()-1);while(dates.has(cursor.toLocaleDateString('en-CA'))){streak++;cursor.setDate(cursor.getDate()-1)}$('streak').textContent=streak;
+const hist=$('history');hist.innerHTML='';if(!entries.length){hist.innerHTML='<div class="empty">No days logged yet. Save your first entry to begin Day 1.</div>';return}
+[...entries].reverse().forEach(e=>{const d=document.createElement('div');d.className='entry'+(editingDate===e.date?' active':'');d.innerHTML=`<div class="entrytop"><strong>Day ${dayNumber(e.date)} · ${safe(e.focus||e.type)}</strong><span class="tag">${safe(e.type)}</span></div><small>${new Date(e.date+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})} · ${e.duration?safe(e.duration)+' min · ':''}${(e.exercises||[]).length} exercises</small>`;d.onclick=()=>load(e);hist.append(d)})}
+$('save').onclick=()=>{const e=collect();if(!e.date){alert('Please choose a date.');return}const idx=entries.findIndex(x=>x.date===e.date);if(idx>=0&&editingDate!==e.date&&!confirm('A log already exists for this date. Replace it?'))return;if(idx>=0)entries[idx]=e;else entries.push(e);editingDate=e.date;persist();$('formTitle').textContent=`Saved ${dayNumber(e.date)}`;$('deleteDay').style.display='inline-block'};
+$('addExercise').onclick=()=>addExercise();$('newDay').onclick=()=>reset();$('clearForm').onclick=()=>{if(confirm('Clear the current form?'))reset()};
+$('deleteDay').onclick=()=>{if(!editingDate)return;if(confirm('Delete this day permanently?')){entries=entries.filter(e=>e.date!==editingDate);persist();reset()}};
+$('export').onclick=()=>{const blob=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='workout-journal-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async ev=>{try{const data=JSON.parse(await ev.target.files[0].text());if(!Array.isArray(data))throw Error();if(confirm('Import and replace your current workout journal?')){entries=data.filter(x=>x.date);persist();reset()}}catch{alert('That backup file could not be read.')}ev.target.value=''};
+addExercise();render();
+</script>
+</body>
+</html>
